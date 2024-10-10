@@ -42,7 +42,7 @@ const TopProperties = (props: TopPropertiesProps) => {
 		},
 	});
 	/** HANDLERS **/
-	const likePropertyHandler = async (user: T, id: String) => {
+	const likePropertyHandler = async (user: T, id: string) => {
 		try {
 			if (!id) return;
 			if (!user._id) throw new Error(Message.SOMETHING_WENT_WRONG);
