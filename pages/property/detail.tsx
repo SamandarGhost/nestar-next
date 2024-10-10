@@ -31,7 +31,7 @@ import { GET_COMMENTS, GET_PROPERTIES, GET_PROPERTY } from '../../apollo/user/qu
 import { CREATE_COMMENT, LIKE_TARGET_PROPERTY } from '../../apollo/user/mutation';
 import { T } from '../../libs/types/common';
 import { Direction, Message } from '../../libs/enums/common.enum';
-import { sweetErrorHandling, sweetMixinErrorAlert } from '../../libs/sweetAlert';
+import { sweetErrorHandling, sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../libs/sweetAlert';
 
 SwiperCore.use([Autoplay, Navigation, Pagination]);
 
@@ -150,13 +150,17 @@ const PropertyDetail: NextPage = ({ initialComment, ...props }: any) => {
 	const likePropertyHandler = async (user: T, id: string) => {
 		try {
 			if (!id) return;
-			if (!user._id) throw new Error(Message.SOMETHING_WENT_WRONG);
+			if (!user._id) throw new Error(Message.NOT_AUTHENTICATED);
+
+			// execute likePropertyHandler mutation
 
 			await likeTargetProperty({
 				variables: { input: id },
 			});
-			await getPropertyRefetch({ input: id })
-			await getPropertiesRefetch({
+
+			// execute getPropertiesRefetch
+			await getPropertyRefetch({ input: id });
+			getPropertiesRefetch({
 				input: {
 					page: 1,
 					limit: 4,
@@ -165,13 +169,15 @@ const PropertyDetail: NextPage = ({ initialComment, ...props }: any) => {
 					search: {
 						locationList: [property?.propertyLocation],
 					},
-				}
+				},
 			});
+
+			await sweetTopSmallSuccessAlert('seccess', 800);
 		} catch (err: any) {
-			console.log('Error, likePropertyHandler:', err.message);
-			sweetMixinErrorAlert(err.message).then();
+			console.log('ERROR, likePropertyHandler:', err);
+			sweetMixinErrorAlert(err.message).then;
 		}
-	}
+	};
 
 	const commentPaginationChangeHandler = async (event: ChangeEvent<unknown>, value: number) => {
 		commentInquiry.page = value;
