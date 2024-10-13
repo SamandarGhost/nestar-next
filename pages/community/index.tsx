@@ -40,7 +40,7 @@ const Community: NextPage = ({ initialInput, ...props }: T) => {
 		loading: boardArticlesLoading,
 		data: boardArticlesData,
 		error: boardArticlesError,
-		refetch: boardArticleRefetch,
+		refetch: boardArticlesRefetch,
 	} = useQuery(GET_BOARD_ARTICLES, {
 		fetchPolicy: 'cache-and-network',
 		variables: {
@@ -94,7 +94,7 @@ const Community: NextPage = ({ initialInput, ...props }: T) => {
 			await likeTargetBoardArticle({
 				variables: { input: id, },
 			});
-			await boardArticleRefetch({ input: searchCommunity });
+			await boardArticlesRefetch({ input: searchCommunity });
 			await sweetTopSmallSuccessAlert('success', 8000);
 		} catch (err: any) {
 			console.log('Error, likeArticleHandler', err.message);
