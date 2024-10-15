@@ -7,6 +7,8 @@ import { Property } from '../../types/property/property';
 import { PropertiesInquiry } from '../../types/property/property.input';
 import { T } from '../../types/common';
 import { useRouter } from 'next/router';
+import { GET_AGENT_PROPERTIES } from '../../../apollo/user/query';
+import { useQuery } from '@apollo/client';
 
 const MyProperties: NextPage = ({ initialInput, ...props }: any) => {
 	const device = useDeviceDetect();
@@ -17,9 +19,24 @@ const MyProperties: NextPage = ({ initialInput, ...props }: any) => {
 	const [total, setTotal] = useState<number>(0);
 
 	/** APOLLO REQUESTS **/
+	const {
+		loading: getPropertiesLoading,
+		data: getropertiesData,
+		error: getAgentPropertiesError,
+		refetch: getPropertiesRefetch,
+	} = useQuery(GET_AGENT_PROPERTIES, {
+		fetchPolicy: 'network-only',
+		variables: { input: searchFilter },
+		skip: !searchFilter?.search?.memberId,
+		notifyOnNetworkStatusChange: true,
+		onCompleted: (data: T) => {
+			setAgentProperties(data?.getProperties?.list);
+			setTotal(data?.getProperties?.metaCounter?.[0]?.total ?? 0);
+		}
+	});
 
 	/** LIFECYCLES **/
-	useEffect(() => {}, [searchFilter]);
+	useEffect(() => { }, [searchFilter]);
 
 	useEffect(() => {
 		if (memberId)
