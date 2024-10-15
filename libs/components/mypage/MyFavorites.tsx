@@ -32,8 +32,8 @@ const MyFavorites: NextPage = () => {
 		},
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => {
-			setMyFavorites(data?.getFavorities?.list);
-			setTotal(data?.getFavorities?.metaCounter?.[0].total || 0);
+			setMyFavorites(data.getFavorities?.list);
+			setTotal(data.getFavorities?.metaCounter?.[0].total || 0);
 		},
 	});
 
