@@ -85,23 +85,24 @@ const Community: NextPage = ({ initialInput, ...props }: T) => {
 		setSearchCommunity({ ...searchCommunity, page: value });
 	};
 
-	const likeArticleHandler = async (e: any, user: any, id: string) => {
+	const likeBoardArticleHandler = async (e: any, user: any, id: any) => {
 		try {
 			e.stopPropagation();
-			if (!id) return
+			if (!id) return;
 			if (!user._id) throw new Error(Messages.error2);
 
 			await likeTargetBoardArticle({
-				variables: { input: id, },
+				variables: { input: id },
 			});
-			await boardArticlesRefetch({ input: searchCommunity });
-			await sweetTopSmallSuccessAlert('success', 8000);
-		} catch (err: any) {
-			console.log('Error, likeArticleHandler', err.message);
-			sweetMixinErrorAlert(err.message).then();
 
+			boardArticlesRefetch({ input: searchCommunity });
+
+			await sweetTopSmallSuccessAlert('success', 800);
+		} catch (err: any) {
+			console.log('ERROR, likeArticleHandler:', err);
+			sweetMixinErrorAlert(err.message).then();
 		}
-	}
+	};
 
 	if (device === 'mobile') {
 		return <h1>COMMUNITY PAGE MOBILE</h1>;
@@ -180,7 +181,7 @@ const Community: NextPage = ({ initialInput, ...props }: T) => {
 													return <CommunityCard
 														boardArticle={boardArticle}
 														key={boardArticle?._id}
-														likeArticleHandler={likeArticleHandler} />;
+														likeBoardArticleHandler={likeBoardArticleHandler} />;
 												})
 											) : (
 												<Stack className={'no-data'}>
@@ -197,7 +198,7 @@ const Community: NextPage = ({ initialInput, ...props }: T) => {
 													return <CommunityCard
 														boardArticle={boardArticle}
 														key={boardArticle?._id}
-														likeArticleHandler={likeArticleHandler} />;
+														likeBoardArticleHandler={likeBoardArticleHandler} />;
 												})
 											) : (
 												<Stack className={'no-data'}>
@@ -214,7 +215,7 @@ const Community: NextPage = ({ initialInput, ...props }: T) => {
 													return <CommunityCard
 														boardArticle={boardArticle}
 														key={boardArticle?._id}
-														likeArticleHandler={likeArticleHandler} />;
+														likeBoardArticleHandler={likeBoardArticleHandler} />;
 												})
 											) : (
 												<Stack className={'no-data'}>
@@ -231,7 +232,7 @@ const Community: NextPage = ({ initialInput, ...props }: T) => {
 													return <CommunityCard
 														boardArticle={boardArticle}
 														key={boardArticle?._id}
-														likeArticleHandler={likeArticleHandler} />;
+														likeBoardArticleHandler={likeBoardArticleHandler} />;
 												})
 											) : (
 												<Stack className={'no-data'}>

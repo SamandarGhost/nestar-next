@@ -7,7 +7,7 @@ import { Property } from '../../types/property/property';
 import { PropertiesInquiry } from '../../types/property/property.input';
 import { T } from '../../types/common';
 import { useRouter } from 'next/router';
-import { GET_AGENT_PROPERTIES } from '../../../apollo/user/query';
+import { GET_PROPERTIES } from '../../../apollo/user/query';
 import { useQuery } from '@apollo/client';
 
 const MyProperties: NextPage = ({ initialInput, ...props }: any) => {
@@ -21,22 +21,24 @@ const MyProperties: NextPage = ({ initialInput, ...props }: any) => {
 	/** APOLLO REQUESTS **/
 	const {
 		loading: getPropertiesLoading,
-		data: getropertiesData,
-		error: getAgentPropertiesError,
+		data: getPropertiesData,
+		error: getPropertiesError,
 		refetch: getPropertiesRefetch,
-	} = useQuery(GET_AGENT_PROPERTIES, {
+	} = useQuery(GET_PROPERTIES, {
 		fetchPolicy: 'network-only',
 		variables: { input: searchFilter },
 		skip: !searchFilter?.search?.memberId,
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => {
 			setAgentProperties(data?.getProperties?.list);
-			setTotal(data?.getProperties?.metaCounter?.[0]?.total ?? 0);
-		}
+			setTotal(data?.getProperties?.metaCounter[0]?.total ?? 0);
+		},
 	});
 
 	/** LIFECYCLES **/
-	useEffect(() => { }, [searchFilter]);
+	useEffect(() => {
+		getPropertiesRefetch().then();
+	}, [searchFilter]);
 
 	useEffect(() => {
 		if (memberId)

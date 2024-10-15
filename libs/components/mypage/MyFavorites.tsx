@@ -21,38 +21,40 @@ const MyFavorites: NextPage = () => {
 	const [likeTargetProperty] = useMutation(LIKE_TARGET_PROPERTY);
 
 	const {
-		loading: getFavoritiesLoading,
-		data: getFavoritiesData,
-		error: getFavoritiesError,
-		refetch: getFavoritiesRefetch,
+		loading: getFavoritesLoading,
+		data: getFavoritesData,
+		error: getFavoritesError,
+		refetch: getFavoritesRefetch,
 	} = useQuery(GET_FAVORITES, {
 		fetchPolicy: 'network-only',
-		variables: {
-			input: searchFavorites,
-		},
+		variables: { input: searchFavorites },
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => {
-			setMyFavorites(data.getFavorities?.list);
-			setTotal(data.getFavorities?.metaCounter?.[0].total || 0);
+			setMyFavorites(data?.getFavorites?.list);
+			setTotal(data?.getFavorites?.metaCounter?.[0]?.total ?? 0);
 		},
 	});
 
+
 	/** HANDLERS **/
-	const likePropertyHandler = async (user: any, id: string) => {
+	const likePropertyHandler = async (user: T, id: string) => {
 		try {
 			if (!id) return;
 			if (!user._id) throw new Error(Messages.error2);
 
+			// execute likePropertyHandler mutation
 			await likeTargetProperty({
-				variables: {
-					input: id,
-				},
+				variables: { input: id },
 			});
-			await getFavoritiesRefetch({ input: searchFavorites });
+
+			// execute getPropertiesRefetch
+			getFavoritesRefetch({ input: searchFavorites });
 		} catch (err: any) {
-			sweetMixinErrorAlert(err).then();
+			console.log('ERROR, likePropertyHandler:', err);
+			sweetMixinErrorAlert(err.message).then();
 		}
-	}
+	};
+
 
 	const paginationHandler = (e: T, value: number) => {
 		setSearchFavorites({ ...searchFavorites, page: value });

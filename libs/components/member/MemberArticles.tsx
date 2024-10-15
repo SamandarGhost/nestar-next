@@ -9,9 +9,9 @@ import { BoardArticle } from '../../types/board-article/board-article';
 import { BoardArticlesInquiry } from '../../types/board-article/board-article.input';
 import { GET_BOARD_ARTICLES } from '../../../apollo/user/query';
 import { useMutation, useQuery } from '@apollo/client';
-import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../sweetAlert';
-import { Messages } from '../../config';
 import { LIKE_TARGET_BOARD_ARTICLE } from '../../../apollo/user/mutation';
+import { Messages } from '../../config';
+import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../sweetAlert';
 
 const MemberArticles: NextPage = ({ initialInput, ...props }: any) => {
 	const device = useDeviceDetect();
@@ -23,21 +23,18 @@ const MemberArticles: NextPage = ({ initialInput, ...props }: any) => {
 
 	/** APOLLO REQUESTS **/
 	const [likeTargetBoardArticle] = useMutation(LIKE_TARGET_BOARD_ARTICLE);
-
 	const {
 		loading: boardArticlesLoading,
 		data: boardArticlesData,
-		error: boardArticlesError,
+		error: getBoardArticlesError,
 		refetch: boardArticlesRefetch,
 	} = useQuery(GET_BOARD_ARTICLES, {
 		fetchPolicy: 'network-only',
-		variables: {
-			input: searchFilter,
-		},
+		variables: { input: searchFilter },
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => {
 			setMemberBoArticles(data?.getBoardArticles?.list);
-			setTotal(data?.getBoardArticles?.metaCounter[0]?.total || 0);
+			setTotal(data?.getBoardArticles?.metaCounter[0]?.total ?? 0);
 		},
 	});
 
@@ -47,26 +44,29 @@ const MemberArticles: NextPage = ({ initialInput, ...props }: any) => {
 	}, [memberId]);
 
 	/** HANDLERS **/
-
-	const likeArticleHandler = async (e: any, user: any, id: string) => {
-		try {
-			e.stopPropagation();
-			if (!id) return
-			if (!user._id) throw new Error(Messages.error2);
-
-			await likeTargetBoardArticle({
-				variables: { input: id, },
-			});
-			await boardArticlesRefetch({ input: searchFilter });
-			await sweetTopSmallSuccessAlert('success', 8000);
-		} catch (err: any) {
-			console.log('Error, likeArticleHandler', err.message);
-			sweetMixinErrorAlert(err.message).then();
-		}
-	}
-
 	const paginationHandler = (e: T, value: number) => {
 		setSearchFilter({ ...searchFilter, page: value });
+	};
+
+	const likeBoardArticleHandler = async (e: any, user: any, id: string) => {
+		try {
+			e.stopPropagation();
+			if (!id) return;
+			if (!user._id) throw new Error(Messages.error2);
+
+			// execute likePropertyHandler mutation
+			await likeTargetBoardArticle({
+				variables: { input: id },
+			});
+
+			// execute getPropertiesRefetch
+			boardArticlesRefetch({ input: searchFilter });
+
+			await sweetTopSmallSuccessAlert('success', 800);
+		} catch (err: any) {
+			console.log('ERROR, likeArticleHandler:', err);
+			sweetMixinErrorAlert(err.message).then();
+		}
 	};
 
 	if (device === 'mobile') {
@@ -87,7 +87,14 @@ const MemberArticles: NextPage = ({ initialInput, ...props }: any) => {
 						</div>
 					)}
 					{memberBoArticles?.map((boardArticle: BoardArticle) => {
-						return <CommunityCard boardArticle={boardArticle} key={boardArticle?._id} size={'small'} likeArticleHandler={likeArticleHandler} />;
+						return (
+							<CommunityCard
+								boardArticle={boardArticle}
+								likeBoardArticleHandler={likeBoardArticleHandler}
+								key={boardArticle?._id}
+								size={'small'}
+							/>
+						);
 					})}
 				</Stack>
 				{memberBoArticles?.length !== 0 && (

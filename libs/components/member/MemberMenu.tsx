@@ -30,13 +30,11 @@ const MemberMenu = (props: MemberMenuProps) => {
 		refetch: getMemberRefetch,
 	} = useQuery(GET_MEMBER, {
 		fetchPolicy: 'network-only',
-		variables: {
-			input: memberId,
-		},
+		variables: { input: memberId },
 		skip: !memberId,
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => {
-			setMember(data?.getmember);
+			setMember(data?.getMember);
 		},
 	});
 
