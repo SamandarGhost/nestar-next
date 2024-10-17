@@ -189,7 +189,7 @@ const CommunityArticleList = (props: CommunityArticleListProps) => {
 										<Moment format={'DD.MM.YY HH:mm'}>{article?.createdAt}</Moment>
 									</TableCell>
 									<TableCell align="center">
-										{article.articleStatus === BoardArticleStatus.DELETE ? (
+										{article.articleStatus === 'DELETE' ? (
 											<Button
 												variant="outlined"
 												sx={{ p: '3px', border: 'none', ':hover': { border: '1px solid #000000' } }}
